@@ -22,8 +22,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.emp.backend.dto.EmployeeDTO;
 import com.emp.backend.dto.EmployeeLoginDTO;
+import com.emp.backend.dto.LoginMessage;
 import com.emp.backend.entity.EmployeeEntity;
 import com.emp.backend.service.EmployeeService;
+
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -53,12 +55,13 @@ public class EmployeeController {
 	
 
 	@PostMapping("/login")
-	public ResponseEntity<String> loginUser(@RequestBody EmployeeLoginDTO loginDTO) {
-		Authentication authentication = authenticationManager
-				.authenticate(new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword()));
-		SecurityContextHolder.getContext().setAuthentication(authentication);
+	public ResponseEntity<?> loginUser(@RequestBody EmployeeLoginDTO loginDTO) {
+//		Authentication authentication = authenticationManager
+//				.authenticate(new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword()));
+//		SecurityContextHolder.getContext().setAuthentication(authentication);
 
-		return new ResponseEntity<>("User Successfully Login", HttpStatus.OK);
+		LoginMessage message= service.employeeLogin(loginDTO);
+		return new ResponseEntity<>(message, HttpStatus.OK);
 
 	}
 

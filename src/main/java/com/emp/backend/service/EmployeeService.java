@@ -5,6 +5,7 @@ import java.util.List;
 import com.emp.backend.dto.EmployeeDTO;
 import com.emp.backend.dto.EmployeeLoginDTO;
 import com.emp.backend.dto.EmployeeLogout;
+import com.emp.backend.dto.LoginMessage;
 import com.emp.backend.entity.EmployeeEntity;
 
 public interface EmployeeService {
@@ -25,8 +26,10 @@ public interface EmployeeService {
 
 	public EmployeeEntity findByFristnameAndLastname(String firstName, String lastName);
 	
-	public EmployeeDTO employeeLogin(EmployeeLoginDTO loginDTO);
+	public LoginMessage employeeLogin(EmployeeLoginDTO loginDTO);
 	
 	public String logout(EmployeeLogout logout);
+	
+	
 
 }

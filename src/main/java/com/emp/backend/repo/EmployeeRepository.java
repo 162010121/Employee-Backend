@@ -1,5 +1,7 @@
 package com.emp.backend.repo;
 
+import java.util.Optional;
+
 import javax.transaction.Transactional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,6 +22,7 @@ public interface EmployeeRepository extends JpaRepository<EmployeeEntity,Long>{
 	@Query(value = " SELECT * FROM employee ud WHERE ud.email = :email ", nativeQuery = true)
 	EmployeeEntity findByEmailId(@Param(value = "email") String email);
 	
+	Optional<EmployeeEntity> findByEmailAndPassword(String email,String password);
 	
 	@Transactional
 	@Query(value = " DELETE * FROM employee ud WHERE ud.email = :email ", nativeQuery = true)

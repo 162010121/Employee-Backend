@@ -1,7 +1,7 @@
 package com.emp.backend.impl;
 
-import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 import com.emp.backend.dto.EmployeeDTO;
 import com.emp.backend.dto.EmployeeLoginDTO;
 import com.emp.backend.dto.EmployeeLogout;
+import com.emp.backend.dto.LoginMessage;
 import com.emp.backend.entity.EmployeeEntity;
-import com.emp.backend.exception.UserCustomException;
 import com.emp.backend.repo.EmployeeRepository;
 import com.emp.backend.service.EmployeeService;
 
@@ -118,38 +118,38 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 	}
 
-	@Override
-	public EmployeeDTO employeeLogin(EmployeeLoginDTO loginDTO) {
-
-		if (loginDTO.getEmail() != null && !loginDTO.getEmail().isEmpty()) {
-			EmployeeDTO dto = new EmployeeDTO();
-
-			dto.setEmail(loginDTO.getEmail());
-		}
-		EmployeeEntity findByEmail = repo.findByEmailId(loginDTO.getEmail().toLowerCase());
-		if (null != findByEmail) {
-			// String securePassword = getSecurePassword(loginDTO.getPassword());
-
-			if (findByEmail.getPassword().equals(loginDTO.getPassword())) {
-				EmployeeDTO employeeDTO = new EmployeeDTO();
-				employeeDTO.setId(findByEmail.getId());
-				employeeDTO.setFristName(findByEmail.getFristName());
-				employeeDTO.setLastName(findByEmail.getLastName());
-				employeeDTO.setEmail(findByEmail.getEmail());
-				employeeDTO.setPassword(findByEmail.getPassword());
-				employeeDTO.setLoginAt(new Date());
-				employeeDTO.setDepartment(findByEmail.getDepartment());
-				// employeeDTO.setAction(null);
-				return employeeDTO;
-			} else {
-				throw new UserCustomException("Please Enter Correct Username And Password");
-			}
-
-		} else {
-			throw new UserCustomException("no such record found");
-		}
-
-	}
+//	@Override
+//	public EmployeeDTO employeeLogin(EmployeeLoginDTO loginDTO) {
+//
+//		if (loginDTO.getEmail() != null && !loginDTO.getEmail().isEmpty()) {
+//			EmployeeDTO dto = new EmployeeDTO();
+//
+//			dto.setEmail(loginDTO.getEmail());
+//		}
+//		EmployeeEntity findByEmail = repo.findByEmailId(loginDTO.getEmail().toLowerCase());
+//		if (null != findByEmail) {
+//			// String securePassword = getSecurePassword(loginDTO.getPassword());
+//
+//			if (findByEmail.getPassword().equals(loginDTO.getPassword())) {
+//				EmployeeDTO employeeDTO = new EmployeeDTO();
+//				employeeDTO.setId(findByEmail.getId());
+//				employeeDTO.setFristName(findByEmail.getFristName());
+//				employeeDTO.setLastName(findByEmail.getLastName());
+//				employeeDTO.setEmail(findByEmail.getEmail());
+//				employeeDTO.setPassword(findByEmail.getPassword());
+//				employeeDTO.setLoginAt(new Date());
+//				employeeDTO.setDepartment(findByEmail.getDepartment());
+//				// employeeDTO.setAction(null);
+//				return employeeDTO;
+//			} else {
+//				throw new UserCustomException("Please Enter Correct Username And Password");
+//			}
+//
+//		} else {
+//			throw new UserCustomException("no such record found");
+//		}
+//
+//	}
 
 	@Override
 	public String logout(EmployeeLogout logout) {
@@ -168,7 +168,33 @@ public class EmployeeServiceImpl implements EmployeeService {
 		return repo.save(entity);
 	}
 
+	@Override
+	public LoginMessage employeeLogin(EmployeeLoginDTO loginDTO) {
+		EmployeeEntity entity = repo.findByEmailId(loginDTO.getEmail());
+		if (entity != null) {
+			String password = loginDTO.getPassword();
+			String encodePassword = entity.getPassword();
+			Boolean isPwdRight = passwordEncoder.matches(password, encodePassword);
+			if (isPwdRight) {
+				Optional<EmployeeEntity> empEntity = repo.findByEmailAndPassword(loginDTO.getEmail(), encodePassword);
+				if (empEntity.isPresent()) {
+					return new LoginMessage(entity.getFristName() + " "+"Succesfully Login", true);
+				} else {
+					return new LoginMessage("Login Failed", false);
+				}
+			} else {
+				return new LoginMessage("Password Not Matched", false);
+			}
+
+		} else {
+			return new LoginMessage("Email not Exists", false);
+		}
+
+	}
+
+	}
 
 
 
-}
+
+
